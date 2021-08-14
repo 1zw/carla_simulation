@@ -1,0 +1,11 @@
+lane_detection:
+  ros__parameters:
+    qos_length: 10
+    segmentation_topic: '' # TODO
+    lane_geometry_topic: '' # TODO
+    lane_parameters_topic: '' # TODO
+    lane_color: [50,234,157] # location:(537, 382)
+    lane_geometry_frame_id: '' #TODO
+    xm_per_pix: 0 #TODO
+    ym_per_pix: 0 #TODO
+    lane_parameters_frame_id: '' #TODO
