@@ -1,11 +1,25 @@
 lane_detection:
-  ros__parameters:
-    qos_length: 10
-    segmentation_topic: '' # TODO
-    lane_geometry_topic: '' # TODO
-    lane_parameters_topic: '' # TODO
-    lane_color: [50,234,157] # location:(537, 382)
-    lane_geometry_frame_id: '' #TODO
-    xm_per_pix: 0 #TODO
-    ym_per_pix: 0 #TODO
-    lane_parameters_frame_id: '' #TODO
+    ros__parameters:
+        frame_id:
+            lane_geometry:                    'laneGeometryFrameId'
+            lane_parameters:                  'laneParametersFrameId'
+        lane_color:                           [50,234,157] # location:(537, 382)
+        m_per_pix:
+            x:                                0.010278
+            y:                                0.033333
+        qos_length:                           10
+        roi:
+            height:                           0 # TODO
+            width1:                           0 # TODO
+            width2:                           0 # TODO
+            x1_offset:                        0 # TODO
+            x2_offset:                        0 # TODO
+            y_offset:                         0 # TODO
+        topic:
+            segmentation:                     'carla/<PARENT ROLE NAME>/<SENSOR ROLE NAME>/image' # TODO
+            lane_geometry:                    'lane/geometry' # TODO
+            lane_parameters:                  'lane/parameters' # TODO
+    
+    
+
+    

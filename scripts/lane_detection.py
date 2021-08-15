@@ -21,15 +21,15 @@ class LaneDetection(Node):
         # Declare ROS parameters
         self.declare_parameters(namespace='',
                                	parameters=[('qos_length'),
-                                            ('segmentation_topic','',self.addDescription()),
-                                            ('lane_geometry_topic','',self.addDescription()),
-                                            ('lane_parameters_topic','',self.addDescription()),
+                                            ('topic.segmentation','',self.addDescription()),
+                                            ('topic.lane_geometry','',self.addDescription()),
+                                            ('topic.lane_parameters','',self.addDescription()),
                                             ('lane_color',[0,0,0]),
                                             ('debug_view',False,self.addDescription()),
-                                            ('lane_geometry_frame_id','',self.addDescription()),
-                                            ('xm_per_pix'),
-                                            ('ym_per_pix'),
-                                            ('lane_parameters_frame_id','',self.addDescription())])
+                                            ('frame_id.lane_geometry','',self.addDescription()),
+                                            ('m_per_pix.x'),
+                                            ('m_per_pix.y'),
+                                            ('frame_id.lane_parameters','',self.addDescription())])
         self.nodeParams()
 
         self.add_on_set_parameters_callback(self.paramsCallback)
@@ -51,30 +51,30 @@ class LaneDetection(Node):
 
     def addDescription(self,from_value=None,to_value=None,step=None):
         descriptor = ParameterDescriptor()
+        descriptor.description = "-"
         if None not in [from_value,to_value,step]:
             integer_range = IntegerRange()
             integer_range.from_value = from_value
             integer_range.to_value = to_value
             integer_range.step = step
             descriptor.integer_range = [integer_range]
-        descriptor.description = "-"
         return descriptor
 
     def nodeParams(self):
-        self.segmentation_topic = self.get_parameter('segmentation_topic').get_parameter_value().string_value
-        self.lane_geo_topic = self.get_parameter('lane_geometry_topic').get_parameter_value().string_value
-        self.lane_params_topic = self.get_parameter('lane_parameters_topic').get_parameter_value().string_value
+        self.segmentation_topic = self.get_parameter('topic.segmentation').get_parameter_value().string_value
+        self.lane_geo_topic = self.get_parameter('topic.lane_geometry').get_parameter_value().string_value
+        self.lane_params_topic = self.get_parameter('topic.lane_parameters').get_parameter_value().string_value
         self.lane_color = np.array(self.get_parameter('lane_color').get_parameter_value().integer_array_value)
         self.do_on_set = True
         self.declared = False
-        self.roi_vars = ['roi/x1_offset','roi/x2_offset','roi/y_offset','roi/width1','roi/width2','roi/height']
+        self.roi_vars = ['roi.x1_offset','roi.x2_offset','roi.y_offset','roi.width1','roi.width2','roi.height']
         self.debug_view = self.get_parameter('debug_view').get_parameter_value().bool_value
         self.lane_geo_msg = LaneGeometry()
-        self.lane_geo_msg.header.frame_id = self.get_parameter('lane_geometry_frame_id').get_parameter_value().string_value
-        self.xm_per_pix = self.get_parameter('xm_per_pix').get_parameter_value().double_value
-        self.ym_per_pix = self.get_parameter('ym_per_pix').get_parameter_value().double_value
+        self.lane_geo_msg.header.frame_id = self.get_parameter('frame_id.lane_geometry').get_parameter_value().string_value
+        self.xm_per_pix = self.get_parameter('m_per_pix.x').get_parameter_value().double_value # 3.7 meters / 360 pixels
+        self.ym_per_pix = self.get_parameter('m_per_pix.y').get_parameter_value().double_value # 16 meters / 480 pixels
         self.lane_params_msg = LaneParameters()
-        self.lane_params_msg.header.frame_id = self.get_parameter('lane_parameters_frame_id').get_parameter_value().string_value
+        self.lane_params_msg.header.frame_id = self.get_parameter('frame_id.lane_parameters').get_parameter_value().string_value
 
     def paramsCallback(self,params):
         success = False
@@ -110,20 +110,20 @@ class LaneDetection(Node):
 
             if self.declared == False:
                 self.declare_parameters(namespace='',
-                                        parameters=[('roi/x1_offset',0,self.addDescription(0,self.width,1)),
-                                                    ('roi/x2_offset',0,self.addDescription(0,self.width,1)),
-                                                    ('roi/y_offset',0,self.addDescription(0,self.height,1)),
-                                                    ('roi/width1',0,self.addDescription(0,self.width,1)),
-                                                    ('roi/width2',0,self.addDescription(0,self.width,1)),
-                                                    ('roi/height',0,self.addDescription(0,self.height,1))])
+                                        parameters=[('roi.x1_offset',0,self.addDescription(0,self.width,1)),
+                                                    ('roi.x2_offset',0,self.addDescription(0,self.width,1)),
+                                                    ('roi.y_offset',0,self.addDescription(0,self.height,1)),
+                                                    ('roi.width1',0,self.addDescription(0,self.width,1)),
+                                                    ('roi.width2',0,self.addDescription(0,self.width,1)),
+                                                    ('roi.height',0,self.addDescription(0,self.height,1))])
                 self.declared = True
 
-            roi_x1 = self.get_parameter('roi/x1_offset').get_parameter_value().integer_value
-            roi_x2 = self.get_parameter('roi/x2_offset').get_parameter_value().integer_value
-            roi_y = self.get_parameter('roi/y_offset').get_parameter_value().integer_value
-            roi_h = self.get_parameter('roi/height').get_parameter_value().integer_value
-            roi_w1 = self.get_parameter('roi/width1').get_parameter_value().integer_value
-            roi_w2 = self.get_parameter('roi/width2').get_parameter_value().integer_value
+            roi_x1 = self.get_parameter('roi.x1_offset').get_parameter_value().integer_value
+            roi_x2 = self.get_parameter('roi.x2_offset').get_parameter_value().integer_value
+            roi_y = self.get_parameter('roi.y_offset').get_parameter_value().integer_value
+            roi_h = self.get_parameter('roi.height').get_parameter_value().integer_value
+            roi_w1 = self.get_parameter('roi.width1').get_parameter_value().integer_value
+            roi_w2 = self.get_parameter('roi.width2').get_parameter_value().integer_value
 
             src = np.float32([[(roi_x1+roi_w1),roi_y],
                               [(roi_x2+roi_w2),(roi_y+roi_h)],

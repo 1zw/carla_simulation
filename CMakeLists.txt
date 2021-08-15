@@ -32,6 +32,7 @@ install(PROGRAMS
 # Install custom messages
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LaneGeometry.msg"
+  "msg/LaneParameters.msg"
  )
 
 ament_package()
