@@ -1,5 +1,6 @@
 lane_detection:
     ros__parameters:
+        debug_view:                           false
         frame_id:
             lane_geometry:                    'laneGeometryFrameId'
             lane_parameters:                  'laneParametersFrameId'
@@ -16,10 +17,7 @@ lane_detection:
             x2_offset:                        0 # TODO
             y_offset:                         0 # TODO
         topic:
-            segmentation:                     'carla/<PARENT ROLE NAME>/<SENSOR ROLE NAME>/image' # TODO
-            lane_geometry:                    'lane/geometry' # TODO
-            lane_parameters:                  'lane/parameters' # TODO
-    
-    
-
-    
+            lane_geometry:                    'lane/geometry'
+            lane_parameters:                  'lane/parameters'
+            segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'
+            

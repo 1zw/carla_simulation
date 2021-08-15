@@ -24,7 +24,7 @@ class LaneDetection(Node):
                                             ('topic.segmentation','',self.addDescription()),
                                             ('topic.lane_geometry','',self.addDescription()),
                                             ('topic.lane_parameters','',self.addDescription()),
-                                            ('lane_color',[0,0,0]),
+                                            ('lane_color'),
                                             ('debug_view',False,self.addDescription()),
                                             ('frame_id.lane_geometry','',self.addDescription()),
                                             ('m_per_pix.x'),
@@ -51,7 +51,7 @@ class LaneDetection(Node):
 
     def addDescription(self,from_value=None,to_value=None,step=None):
         descriptor = ParameterDescriptor()
-        descriptor.description = "-"
+        descriptor.description = ''
         if None not in [from_value,to_value,step]:
             integer_range = IntegerRange()
             integer_range.from_value = from_value
