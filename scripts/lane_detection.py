@@ -129,7 +129,7 @@ class LaneDetection(Node):
                               [(roi_x2+roi_w2),(roi_y+roi_h)],
                               [roi_x2,(roi_y+roi_h)],
                               [roi_x1,roi_y]])
-            dst = np.float32([[self.width,0],[self.width,self.height],[0,self.height],[0,0]])
+            dst = np.float32([[3*self.width//4,0],[3*self.width//4,self.height],[self.width//4,self.height],[self.width//4,0]])
             self.M = cv2.getPerspectiveTransform(src,dst)
             Minv = cv2.getPerspectiveTransform(dst,src)
             self.lane_geo_msg.transformation_matrix = Minv.flatten().tolist()

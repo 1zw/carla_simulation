@@ -7,12 +7,12 @@ This Repository contains a ROS2 application for a Self-Driving Car in Carla Simu
 - Ubuntu 20.04 LTS
 - Quad-core Intel or AMD processor (2.5 GHz or faster)
 - NVIDIA GeForce 1650 GTX or higher
-- 8 GB RAM, 128 GB Disk Space
+- 8 GB RAM, 32 GB free Disk Space
 
 ## Software Prerequisites:
 
 - CARLA 0.9.11
-    - Download CARLA simulator packaged version from this **[Link](https://carla-releases.s3.eu-west-3.amazonaws.com/Linux/CARLA_0.9.11.tar.gz)** and extract to *$HOME*.
+    - Download CARLA simulator packaged version from this **[Link](https://carla-releases.s3.eu-west-3.amazonaws.com/Linux/CARLA_0.9.11.tar.gz)** and extract it to **$HOME** directory.
 - ROS2 Foxy Fitzroy 
     - Install ROS2 Desktop by following these **[Instructions](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)**.
     - Run the following commands in the terminal.
@@ -21,5 +21,5 @@ This Repository contains a ROS2 application for a Self-Driving Car in Carla Simu
         sudo rosdep init
         rosdep update
         
-        echo "source /opt/ros/dashing/setup.bash" >> ~/.bashrc
+        echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
         ```
