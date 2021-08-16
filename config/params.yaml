@@ -10,12 +10,12 @@ lane_detection:
             y:                                0.033333
         qos_length:                           10
         roi:
-            height:                           0 # TODO
-            width1:                           0 # TODO
-            width2:                           0 # TODO
-            x1_offset:                        0 # TODO
-            x2_offset:                        0 # TODO
-            y_offset:                         0 # TODO
+            height:                           202
+            width1:                           66
+            width2:                           405
+            x1_offset:                        327
+            x2_offset:                        157
+            y_offset:                         278
         topic:
             lane_geometry:                    'lane/geometry'
             lane_parameters:                  'lane/parameters'
