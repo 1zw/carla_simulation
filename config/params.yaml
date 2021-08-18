@@ -11,11 +11,16 @@ lane_detection:
         qos_length:                           10
         roi:
             height:                           202
-            width1:                           66
+            width1:                           65
             width2:                           405
             x1_offset:                        327
             x2_offset:                        157
             y_offset:                         278
+        search_params:
+            margin:                           20
+            mean_limit:                       10
+            min_pixels:                       40
+            n_windows:                        10
         topic:
             lane_geometry:                    'lane/geometry'
             lane_parameters:                  'lane/parameters'
