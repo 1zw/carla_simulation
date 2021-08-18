@@ -73,7 +73,7 @@ class LaneDetection(Node):
     	seg_img = self.bridge.imgmsg_to_cv2(msg)
         binary = cv2.inRange(seg_img, self.lane_color, self.lane_color)
         binary = self.perspectiveTransform(binary)
-        if self.debug_view == True:
+        if self.debug_view:
             image = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
             image = cv2.rectangle(binary,((self.width // 4),0),((3 * self.width // 4),self.height), (255,0,0), 2)
             cv2.imshow(image)
