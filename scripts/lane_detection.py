@@ -9,8 +9,7 @@ from rclpy.parameter import Parameter
 from rclpy.qos import QoSProfile, QoSHistoryPolicy, QoSReliabilityPolicy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-from carla_simulation.msg import LaneGeometry
-from carla_simulation.msg import LaneParameters
+from carla_simulation.msg import LaneGeometry, LaneParameters
 
 class LaneDetection(Node):
 
@@ -122,8 +121,10 @@ class LaneDetection(Node):
                     win_xleft_high = leftx_current + self.margin
                     win_xright_low = rightx_current - self.margin
                     win_xright_high = rightx_current + self.margin
-                    good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) & (nonzerox >= win_xleft_low) & (nonzerox < win_xleft_high)).nonzero()[0]
-                    good_right_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) & (nonzerox >= win_xright_low) & (nonzerox < win_xright_high)).nonzero()[0]
+                    good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) &
+                                      (nonzerox >= win_xleft_low) & (nonzerox < win_xleft_high)).nonzero()[0]
+                    good_right_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) &
+                                       (nonzerox >= win_xright_low) & (nonzerox < win_xright_high)).nonzero()[0]
                     left_lane_inds.append(good_left_inds)
                     right_lane_inds.append(good_right_inds)
                     if len(good_left_inds) > self.minpix:
@@ -138,14 +139,14 @@ class LaneDetection(Node):
                 self.sliding_window = False
         else: # Searching around polynomial
             left_lane_inds = ((nonzerox > (self.left_fit[0] * (nonzeroy ** 2) + self.left_fit[1] * nonzeroy + self.left_fit[2] - self.margin)) &
-                             (nonzerox < (self.left_fit[0] * (nonzeroy ** 2) + self.left_fit[1] * nonzeroy + self.left_fit[2] + self.margin)))
+                              (nonzerox < (self.left_fit[0] * (nonzeroy ** 2) + self.left_fit[1] * nonzeroy + self.left_fit[2] + self.margin)))
             right_lane_inds = ((nonzerox > (self.right_fit[0] * (nonzeroy ** 2) + self.right_fit[1] * nonzeroy + self.right_fit[2] - self.margin)) &
-                              (nonzerox < (self.right_fit[0] * (nonzeroy ** 2) + self.right_fit[1] * nonzeroy + self.right_fit[2] + self.margin)))
+                               (nonzerox < (self.right_fit[0] * (nonzeroy ** 2) + self.right_fit[1] * nonzeroy + self.right_fit[2] + self.margin)))
         leftx = nonzerox[left_lane_inds]
         lefty = nonzeroy[left_lane_inds] 
         rightx = nonzerox[right_lane_inds]
         righty = nonzeroy[right_lane_inds]
-        if len(leftx) > 0 and len(rightx > 0):
+        if len(leftx) > 0 and len(rightx) > 0:
             self.left_fit = np.polyfit(lefty, leftx, 2)
             self.right_fit = np.polyfit(righty, rightx, 2)
             self.lane_geo_msg.left_coefficients = left_fit.tolist()
