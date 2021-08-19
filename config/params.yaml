@@ -1,13 +1,12 @@
 lane_detection:
     ros__parameters:
-        debug_view:                           false
         frame_id:
             lane_geometry:                    'laneGeometryFrameId'
             lane_parameters:                  'laneParametersFrameId'
-        lane_color:                           [50,234,157] # location:(537, 382)
+        lane_color:                           [50,234,157]
         m_per_pix:
-            x:                                0.010278
-            y:                                0.033333
+            x:                                0.010278 # 3.7 meters / 360 pixels
+            y:                                0.033333 # 16 meters / 480 pixels
         qos_length:                           10
         roi:
             height:                           202

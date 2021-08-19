@@ -28,7 +28,6 @@ class LaneDetection(Node):
                                             ('roi.width1'),
                                             ('roi.width2'),
                                             ('roi.height'),
-                                            ('debug_view'),
                                             ('search_params.n_windows'),
                                             ('search_params.margin'),
                                             ('search_params.min_pixels'),
@@ -56,7 +55,6 @@ class LaneDetection(Node):
     def nodeParams(self):
         self.lane_color = np.array(self.get_parameter('lane_color').get_parameter_value().integer_array_value)
         self.do_once = True
-        self.debug_view = self.get_parameter('debug_view').get_parameter_value().bool_value
         self.sliding_window = True
         self.nwindows = self.get_parameter('search_params.n_windows').get_parameter_value().integer_value
         self.margin = self.get_parameter('search_params.margin').get_parameter_value().integer_value
@@ -64,20 +62,16 @@ class LaneDetection(Node):
         self.mean_limit = self.get_parameter('search_params.mean_limit').get_parameter_value().double_value
         self.lane_geo_msg = LaneGeometry()
         self.lane_geo_msg.header.frame_id = self.get_parameter('frame_id.lane_geometry').get_parameter_value().string_value
-        self.xm_per_pix = self.get_parameter('m_per_pix.x').get_parameter_value().double_value # 3.7 meters / 360 pixels
-        self.ym_per_pix = self.get_parameter('m_per_pix.y').get_parameter_value().double_value # 16 meters / 480 pixels
+        self.xm_per_pix = self.get_parameter('m_per_pix.x').get_parameter_value().double_value
+        self.ym_per_pix = self.get_parameter('m_per_pix.y').get_parameter_value().double_value
         self.lane_params_msg = LaneParameters()
         self.lane_params_msg.header.frame_id = self.get_parameter('frame_id.lane_parameters').get_parameter_value().string_value
 
     def segCallback(self,msg):
     	seg_img = self.bridge.imgmsg_to_cv2(msg)
         binary = cv2.inRange(seg_img, self.lane_color, self.lane_color)
+        binary = binary // 255
         binary = self.perspectiveTransform(binary)
-        if self.debug_view:
-            image = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
-            image = cv2.rectangle(binary,((self.width // 4),0),((3 * self.width // 4),self.height), (255,0,0), 2)
-            cv2.imshow(image)
-            cv2.waitKey(1)
         self.findLanes(binary)
         self.publishLaneMsgs(self,msg.header.stamp)
 
@@ -160,10 +154,10 @@ class LaneDetection(Node):
             bottom_right = self.right_fit[0] * (self.height ** 2) + self.right_fit[1] * self.height + self.right_fit[2]
             center_lane = (bottom_right - bottom_left) / 2 + bottom_left
             self.lane_params_msg.center_offset = (np.abs(self.width / 2) - np.abs(center_lane)) * self.xm_per_pix
-        else: # TODO
+        else:
             self.sliding_window = True
-            self.lane_geo_msg.left_coefficients = []
-            self.lane_geo_msg.left_coefficients = []
+            self.lane_geo_msg.left_coefficients = [0, 0, 0]
+            self.lane_geo_msg.left_coefficients = [0, 0, 0]
             self.lane_params_msg.left_radius = 0
             self.lane_params_msg.right_radius = 0
             self.lane_params_msg.center_offset = 0
