@@ -12,7 +12,8 @@ This Repository contains a ROS2 application for a Self-Driving Car in Carla Simu
 ## Software Prerequisites:
 
 - CARLA 0.9.11
-    - Download CARLA simulator packaged version from this **[Link](https://carla-releases.s3.eu-west-3.amazonaws.com/Linux/CARLA_0.9.11.tar.gz)** and extract it to **$HOME** directory.
+    - Download CARLA simulator packaged version from this **[Link](https://carla-releases.s3.eu-west-3.amazonaws.com/Linux/CARLA_0.9.11.tar.gz)** and extract it to the **$HOME** directory.
+
 - ROS2 Foxy Fitzroy 
     - Install ROS2 Desktop by following these **[Instructions](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)**.
     - Run the following commands in the terminal.
@@ -20,6 +21,16 @@ This Repository contains a ROS2 application for a Self-Driving Car in Carla Simu
         sudo apt-get install python3-colcon-common-extensions python3-rosdep
         sudo rosdep init
         rosdep update
-        
-        echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
+        # Uncomment below line to automatically setup the ros environment on every startup.
+        #echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
         ```
+- Additional requirements
+    - Run the following commands in the terminal.
+        ```bash
+        sudo apt-get install python3-opencv python3-numpy python3-pygame
+        sudo apt-get install ros-foxy-image-pipeline
+        ```
+
+## Setup
+
+- Install CARLA ROS Bridge by following these **[Instructions](https://carla.readthedocs.io/projects/ros-bridge/en/latest/ros_installation_ros2/#ros-bridge-installation)**.

@@ -85,16 +85,16 @@ class LaneDetection(Node):
             roi_h = self.get_parameter('roi.height').get_parameter_value().integer_value
             roi_w1 = self.get_parameter('roi.width1').get_parameter_value().integer_value
             roi_w2 = self.get_parameter('roi.width2').get_parameter_value().integer_value
-            src = np.float32([[(roi_x1+roi_w1),roi_y],
-                              [(roi_x2+roi_w2),(roi_y+roi_h)],
-                              [roi_x2,(roi_y+roi_h)],
+            src = np.float32([[(roi_x1 + roi_w1),roi_y],
+                              [(roi_x2 + roi_w2),(roi_y + roi_h)],
+                              [roi_x2,(roi_y + roi_h)],
                               [roi_x1,roi_y]])
             dst = np.float32([[3 * self.width // 4,0],[3 * self.width // 4,self.height],[self.width // 4,self.height],[self.width // 4,0]])
-            self.M = cv2.getPerspectiveTransform(src,dst)
-            Minv = cv2.getPerspectiveTransform(dst,src)
-            self.lane_geo_msg.transformation_matrix = Minv.flatten().tolist()
+            self.tm = cv2.getPerspectiveTransform(src,dst)
+            tminv = cv2.getPerspectiveTransform(dst,src)
+            self.lane_geo_msg.transformation_matrix = tminv.flatten().tolist()
             self.do_once = False
-        return cv2.warpPerspective(img,self.M,img.shape[::-1],flags=cv2.INTER_LINEAR)
+        return cv2.warpPerspective(img,self.tm,img.shape[::-1],flags=cv2.INTER_LINEAR)
 
     def findLanes(self,img):
         nonzero = img.nonzero()
