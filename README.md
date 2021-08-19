@@ -16,19 +16,20 @@ This Repository contains a ROS2 application for a Self-Driving Car in Carla Simu
 
 - ROS2 Foxy Fitzroy 
     - Install ROS2 Desktop by following these **[Instructions](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)**.
+
+- Additional requirements
     - Run the following commands in the terminal.
-        ```bash
+        ```bash     
+        sudo apt-get install python3-numpy python3-pygame
+
         sudo apt-get install python3-colcon-common-extensions python3-rosdep
         sudo rosdep init
         rosdep update
+
+        sudo apt-get install python3-opencv ros-foxy-image-pipeline
+
         # Uncomment below line to automatically setup the ros environment on every startup.
         #echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
-        ```
-- Additional requirements
-    - Run the following commands in the terminal.
-        ```bash
-        sudo apt-get install python3-opencv python3-numpy python3-pygame
-        sudo apt-get install ros-foxy-image-pipeline
         ```
 
 ## Setup
