@@ -5,7 +5,6 @@ import numpy as np
 import cv2
 
 from rclpy.node import Node
-from rclpy.parameter import Parameter
 from rclpy.qos import QoSProfile, QoSHistoryPolicy, QoSReliabilityPolicy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
