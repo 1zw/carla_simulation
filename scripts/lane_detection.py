@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import rclpy
+import message_filters as mf
 import numpy as np
 import cv2
 
@@ -8,7 +9,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSHistoryPolicy, QoSReliabilityPolicy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-from carla_simulation.msg import LaneGeometry, LaneParameters
+from carla_simulation.msg import LaneParameters
 
 class LaneDetection(Node):
 
@@ -18,23 +19,21 @@ class LaneDetection(Node):
         self.declare_parameters(namespace='',
                                	parameters=[('qos_length', 0),
                                             ('topic.segmentation',''),
-                                            ('topic.lane_geometry',''),
-                                            ('topic.lane_parameters',''),
-                                            ('lane_color',[0,0,0]),
-                                            ('roi.x1_offset',0),
-                                            ('roi.x2_offset',0),
-                                            ('roi.y_offset',0),
-                                            ('roi.width1',0),
-                                            ('roi.width2',0),
-                                            ('roi.height',0),
-                                            ('search_params.n_windows',0),
-                                            ('search_params.margin',0),
-                                            ('search_params.min_pixels',0),
-                                            ('search_params.mean_limit',0),
-                                            ('frame_id.lane_geometry',''),
-                                            ('m_per_pix.x',0),
-                                            ('m_per_pix.y',0),
-                                            ('frame_id.lane_parameters','')])
+                                            ('topic.lane_parameters', ''),
+                                            ('lane_color', [0,0,0]),
+                                            ('roi.x1_offset', 0),
+                                            ('roi.x2_offset', 0),
+                                            ('roi.y_offset', 0),
+                                            ('roi.width1', 0),
+                                            ('roi.width2', 0),
+                                            ('roi.height', 0),
+                                            ('search_params.n_windows', 0),
+                                            ('search_params.margin', 0),
+                                            ('search_params.min_pixels', 0),
+                                            ('search_params.mean_limit', 0),
+                                            ('m_per_pix.x', 0),
+                                            ('m_per_pix.y', 0),
+                                            ('frame_id.lane_parameters', '')])
         self.nodeParams()
         qos_length = self.get_parameter('qos_length').get_parameter_value().integer_value
         qos_profile = QoSProfile(depth=qos_length,
@@ -43,11 +42,14 @@ class LaneDetection(Node):
         # Load cv_bridge
         self.bridge = CvBridge()
         # Create Subscribers
+        rgb_topic = self.get_parameter('topic.rgb_image').get_parameter_value().string_value
+        self.rgb_sub = mf.Subscriber(self,Image,rgb_topic,qos_profile=qos_profile)
         segmentation_topic = self.get_parameter('topic.segmentation').get_parameter_value().string_value
-        self.seg_sub = self.create_subscription(Image,segmentation_topic,self.segCallback,qos_profile)
+        self.seg_sub = mf.Subscriber(self,Image, segmentation_topic,qos_profile=qos_profile)
+        # Apply message filter
+        self.timestamp_sync = mf.TimeSynchronizer([self.rgb_sub,self.seg_sub],queue_size=qos_length)
+        self.timestamp_sync.registerCallback(self.displayCallback)
         # Create Publishers
-        lane_geo_topic = self.get_parameter('topic.lane_geometry').get_parameter_value().string_value
-        self.lane_geo_pub = self.create_publisher(LaneGeometry,lane_geo_topic,qos_profile)
         lane_params_topic = self.get_parameter('topic.lane_parameters').get_parameter_value().string_value
         self.lane_params_pub = self.create_publisher(LaneParameters,lane_params_topic,qos_profile)
 
@@ -59,45 +61,41 @@ class LaneDetection(Node):
         self.margin = self.get_parameter('search_params.margin').get_parameter_value().integer_value
         self.minpix = self.get_parameter('search_params.min_pixels').get_parameter_value().integer_value
         self.mean_limit = self.get_parameter('search_params.mean_limit').get_parameter_value().double_value
-        self.lane_geo_msg = LaneGeometry()
-        self.lane_geo_msg.header.frame_id = self.get_parameter('frame_id.lane_geometry').get_parameter_value().string_value
         self.xm_per_pix = self.get_parameter('m_per_pix.x').get_parameter_value().double_value
         self.ym_per_pix = self.get_parameter('m_per_pix.y').get_parameter_value().double_value
         self.lane_params_msg = LaneParameters()
         self.lane_params_msg.header.frame_id = self.get_parameter('frame_id.lane_parameters').get_parameter_value().string_value
 
-    def segCallback(self,msg):
-        seg_img = self.bridge.imgmsg_to_cv2(msg)
+    def segCallback(self,rgb_msg,seg_msg):
+        rgb_img = self.bridge.imgmsg_to_cv2(rgb_msg)
+        seg_img = self.bridge.imgmsg_to_cv2(seg_msg)
+        if self.do_once:
+            self.otherNodeParams(seg_img)
         binary = cv2.inRange(seg_img,self.lane_color,self.lane_color) # TODO
         binary = binary // 255
-        binary = self.perspectiveTransform(binary)
+        binary = cv2.warpPerspective(binary,self.tm,binary.shape[::-1],flags=cv2.INTER_LINEAR)
         self.findLanes(binary)
-
-        self.lane_geo_msg.header.stamp = msg.header.stamp
         self.lane_params_msg.header.stamp = msg.header.stamp
-        self.lane_geo_pub.publish(self.lane_geo_msg)
         self.lane_params_pub.publish(self.lane_params_msg)
 
-    def perspectiveTransform(self,img):
-        if self.do_once:
-            self.height = img.shape[0]
-            self.width = img.shape[1]
-            roi_x1 = self.get_parameter('roi.x1_offset').get_parameter_value().integer_value
-            roi_x2 = self.get_parameter('roi.x2_offset').get_parameter_value().integer_value
-            roi_y = self.get_parameter('roi.y_offset').get_parameter_value().integer_value
-            roi_h = self.get_parameter('roi.height').get_parameter_value().integer_value
-            roi_w1 = self.get_parameter('roi.width1').get_parameter_value().integer_value
-            roi_w2 = self.get_parameter('roi.width2').get_parameter_value().integer_value
-            src = np.float32([[(roi_x1 + roi_w1),roi_y],
-                              [(roi_x2 + roi_w2),(roi_y + roi_h)],
-                              [roi_x2,(roi_y + roi_h)],
-                              [roi_x1,roi_y]])
-            dst = np.float32([[3 * self.width // 4,0],[3 * self.width // 4,self.height],[self.width // 4,self.height],[self.width // 4,0]])
-            self.tm = cv2.getPerspectiveTransform(src,dst)
-            tminv = cv2.getPerspectiveTransform(dst,src)
-            self.lane_geo_msg.transformation_matrix = tminv.flatten().tolist()
-            self.do_once = False
-        return cv2.warpPerspective(img,self.tm,img.shape[::-1],flags=cv2.INTER_LINEAR)
+    def otherNodeParams(self,img):
+        self.height = img.shape[0]
+        self.width = img.shape[1]
+        roi_x1 = self.get_parameter('roi.x1_offset').get_parameter_value().integer_value
+        roi_x2 = self.get_parameter('roi.x2_offset').get_parameter_value().integer_value
+        roi_y = self.get_parameter('roi.y_offset').get_parameter_value().integer_value
+        roi_h = self.get_parameter('roi.height').get_parameter_value().integer_value
+        roi_w1 = self.get_parameter('roi.width1').get_parameter_value().integer_value
+        roi_w2 = self.get_parameter('roi.width2').get_parameter_value().integer_value
+        src = np.float32([[(roi_x1 + roi_w1),roi_y],
+                         [(roi_x2 + roi_w2),(roi_y + roi_h)],
+                         [roi_x2,(roi_y + roi_h)],
+                         [roi_x1,roi_y]])
+        dst = np.float32([[3 * self.width // 4,0],[3 * self.width // 4,self.height],[self.width // 4,self.height],[self.width // 4,0]])
+        self.tm = cv2.getPerspectiveTransform(src,dst)
+        self.tminv = cv2.getPerspectiveTransform(dst,src)
+        self.ploty = np.linspace(0,self.height-1,self.height)
+        self.do_once = False
 
     def findLanes(self,img):
         nonzero = img.nonzero()
@@ -143,15 +141,14 @@ class LaneDetection(Node):
         lefty = nonzeroy[left_lane_inds] 
         rightx = nonzerox[right_lane_inds]
         righty = nonzeroy[right_lane_inds]
-        if len(leftx) > 0 and len(rightx) > 0:
+        if len(leftx) > 0 and len(rightx) > 0:# TODO
             self.left_fit = np.polyfit(lefty, leftx, 2)
             self.right_fit = np.polyfit(righty, rightx, 2)
-            self.lane_geo_msg.left_coefficients = self.left_fit.tolist()
-            self.lane_geo_msg.left_coefficients = self.right_fit.tolist()
             # Calculate lane radius
             y_eval = self.height * self.ym_per_pix
             self.lane_params_msg.left_radius = ((1 + (2 * self.left_fit[0] * y_eval + self.left_fit[1]) ** 2) ** 1.5) / np.abs(2 * self.left_fit[0])
             self.lane_params_msg.right_radius = ((1 + (2 * self.right_fit[0] * y_eval + self.right_fit[1]) ** 2) ** 1.5) / np.abs(2 * self.right_fit[0])
+            # TODO
             # Calculate centre offset
             bottom_left = self.left_fit[0] * (self.height ** 2) + self.left_fit[1] * self.height + self.left_fit[2]
             bottom_right = self.right_fit[0] * (self.height ** 2) + self.right_fit[1] * self.height + self.right_fit[2]
@@ -159,11 +156,25 @@ class LaneDetection(Node):
             self.lane_params_msg.centre_offset = (np.abs(self.width / 2) - np.abs(center_lane)) * self.xm_per_pix
         else:
             self.sliding_window = True
-            self.lane_geo_msg.left_coefficients = [0.0, 0.0, 0.0]
-            self.lane_geo_msg.left_coefficients = [0.0, 0.0, 0.0]
             self.lane_params_msg.left_radius = 0.0
             self.lane_params_msg.right_radius = 0.0
             self.lane_params_msg.center_offset = 0.0
+
+    def viewOutput(self,img):
+        if left_fit == [0,0,0]: # TODO
+            left_fitx = self.left_fit[0] * self.ploty ** 2 + self.left_fit[1] * self.ploty + self.left_fit[2]
+            right_fitx = self.right_fit[0] * self.ploty ** 2 + self.right_fit[1] * self.ploty + self.right_fit[2]
+            color_warp = np.zeros_like(img).astype(np.uint8)
+            pts_left = np.array([np.transpose(np.vstack([left_fitx,self.ploty]))])
+            pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx,self.ploty])))])
+            pts = np.hstack((pts_left, pts_right))
+            cv2.fillPoly(color_warp,np.int32([pts]),(0,255,0))
+            newwarp = cv2.warpPerspective(color_warp,self.tminv,(img.shape[1],img.shape[0]))
+            img = cv2.addWeighted(img,1,newwarp,0.3,0)
+            cv2.putText(img,'Centre offset: ' + str() + ' m',(10,50),
+                        cv2.FONT_HERSHEY_SIMPLEX,0.5,(235,52,189),2,cv2.LINE_AA) # TODO
+        cv2.imshow('image',img)
+        cv2.waitKey(1)
         
 
 def main(args=None):

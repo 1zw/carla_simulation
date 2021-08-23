@@ -29,14 +29,9 @@ install(PROGRAMS
   scripts/lane_detection.py
   DESTINATION lib/${PROJECT_NAME}
 )
-install(PROGRAMS
-  scripts/output_view.py
-  DESTINATION lib/${PROJECT_NAME}
-)
 
 # Install Custom Messages
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/LaneGeometry.msg"
   "msg/LaneParameters.msg"
   DEPENDENCIES std_msgs
  )

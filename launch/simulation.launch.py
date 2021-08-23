@@ -13,11 +13,5 @@ def generate_launch_description():
                      output = 'screen',
                      emulate_tty=True,
                      parameters = [config_path])
-    view_node = Node(package = 'carla_simulation',
-                     executable = 'output_view.py',
-                     output = 'screen',
-                     emulate_tty=True,
-                     parameters = [config_path])
     ld.add_action(lane_node)
-    ld.add_action(view_node)
     return ld

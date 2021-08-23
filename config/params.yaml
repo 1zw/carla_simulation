@@ -1,7 +1,6 @@
 lane_detection:
     ros__parameters:
         frame_id:
-            lane_geometry:                    'laneGeometryFrameId'
             lane_parameters:                  'laneParametersFrameId'
         lane_color:                           [50,234,157]
         m_per_pix:
@@ -21,13 +20,6 @@ lane_detection:
             min_pixels:                       40
             n_windows:                        10
         topic:
-            lane_geometry:                    'lane/geometry'
-            lane_parameters:                  'lane/parameters'
-            segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'
-output_view:
-    ros__parameters:
-        qos_length:                           20
-        topic:
-            lane_geometry:                    'lane/geometry'
             lane_parameters:                  'lane/parameters'
             rgb_image:                        'carla/ego_vehicle/rgb_front/image'
+            segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'
