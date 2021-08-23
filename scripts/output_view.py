@@ -17,10 +17,10 @@ class OutputView(Node):
         super().__init__('output_view')
         # Declare ROS parameters
         self.declare_parameters(namespace='',
-                               	parameters=[('qos_length'),
-                                            ('topic.rgb_image'),
-                                            ('topic.lane_geometry'),
-                                            ('topic.lane_parameters')])
+                               	parameters=[('qos_length', 0),
+                                            ('topic.rgb_image',''),
+                                            ('topic.lane_geometry',''),
+                                            ('topic.lane_parameters','')])
         self.nodeParams()
         qos_length = self.get_parameter('qos_length').get_parameter_value().integer_value
         qos_profile = QoSProfile(depth=qos_length,
@@ -48,8 +48,8 @@ class OutputView(Node):
             self.ploty = np.linspace(0,rgb_img.shape[0]-1,rgb_img.shape[0])
             self.minv = np.array(lane_geo_msg.transformation_matrix).reshape((3,3))
             self.do_once = False
-        left_fit = lane_geo_msg.left_coefficients
-        right_fit = lane_geo_msg.right_coefficients
+        left_fit = lane_geo_msg.left_coefficients.tolist()
+        right_fit = lane_geo_msg.right_coefficients.tolist()
         if left_fit == [0,0,0]:
             cv2.imshow(rgb_img)
             cv2.waitKey(1)
@@ -64,6 +64,17 @@ class OutputView(Node):
             newwarp = cv2.warpPerspective(color_warp,self.minv,(rgb_img.shape[1],rgb_img.shape[0]))
             result = cv2.addWeighted(rgb_img,1,newwarp,0.3,0)
             cv2.putText(result,'Centre offset: ' + str(lane_params_msg.centre_offset) + ' m',(10,50),
-                        cv2.FONT_HERSHEY_SIMPLEX,0.8,(235,52,189),2,cv2.LINE_AA)
-            cv2.imshow(result)
+                        cv2.FONT_HERSHEY_SIMPLEX,0.5,(235,52,189),2,cv2.LINE_AA)
+            cv2.imshow('',result)
             cv2.waitKey(1)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    view_node = OutputView()
+    rclpy.spin(view_node)
+    view_node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()

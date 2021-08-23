@@ -8,8 +8,16 @@ from launch_ros.actions import Node
 def generate_launch_description():
     ld = LaunchDescription()
     config_path = os.path.join(get_package_share_directory('carla_simulation'), 'config', 'params.yaml')  
-    base_node = Node(package = 'carla_simulation',
-                     node_executable = 'lane_detection.py',
+    lane_node = Node(package = 'carla_simulation',
+                     executable = 'lane_detection.py',
+                     output = 'screen',
+                     emulate_tty=True,
                      parameters = [config_path])
-    ld.add_action(base_node)
+    view_node = Node(package = 'carla_simulation',
+                     executable = 'output_view.py',
+                     output = 'screen',
+                     emulate_tty=True,
+                     parameters = [config_path])
+    ld.add_action(lane_node)
+    ld.add_action(view_node)
     return ld

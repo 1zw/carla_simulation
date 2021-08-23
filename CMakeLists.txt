@@ -18,6 +18,7 @@ find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(message_filters REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # Install Python Modules
@@ -28,11 +29,16 @@ install(PROGRAMS
   scripts/lane_detection.py
   DESTINATION lib/${PROJECT_NAME}
 )
+install(PROGRAMS
+  scripts/output_view.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 # Install Custom Messages
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LaneGeometry.msg"
   "msg/LaneParameters.msg"
+  DEPENDENCIES std_msgs
  )
 
 # Install Launch Directory
