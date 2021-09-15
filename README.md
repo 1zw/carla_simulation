@@ -37,8 +37,8 @@ This Repository contains a ROS2 application for a Self-Driving Car in Carla Simu
 - Install TensorFlow (2.5.0 or 2.6.0)
     - Software requirements:
         - NVIDIA® GPU driver — 460
-        - CUDA® Toolkit — 11.2 [[download](https://developer.nvidia.com/cuda-11.2.0-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=2004&target_type=debnetwork)] [[documentation](https://docs.nvidia.com/cuda/archive/11.2.0/cuda-installation-guide-linux/index.html)].
-        - cuDNN SDK 8.1.0 [[download](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/8.1.0.77/11.2_20210127/Ubuntu20_04-x64/libcudnn8_8.1.0.77-1+cuda11.2_amd64.deb)] [[documentation](https://docs.nvidia.com/deeplearning/cudnn/archives/cudnn-810/install-guide/index.html)].
+        - CUDA® Toolkit — 11.2 [[download](https://developer.nvidia.com/cuda-11.2.0-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=2004&target_type=debnetwork)] [[documentation](https://docs.nvidia.com/cuda/archive/11.2.0/cuda-installation-guide-linux/index.html)]
+        - cuDNN SDK 8.1.0 [[download1](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/8.1.0.77/11.2_20210127/Ubuntu20_04-x64/libcudnn8_8.1.0.77-1+cuda11.2_amd64.deb)] [[download2](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/8.1.0.77/11.2_20210127/Ubuntu20_04-x64/libcudnn8-dev_8.1.0.77-1+cuda11.2_amd64.deb)] [[documentation](https://docs.nvidia.com/deeplearning/cudnn/archives/cudnn-810/install-guide/index.html)]
 
     - Install TensorFlow by following these **[Instructions](https://www.tensorflow.org/install/pip)**.
 
@@ -51,5 +51,5 @@ This Repository contains a ROS2 application for a Self-Driving Car in Carla Simu
     wget -O protobuf.zip https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protoc-3.17.3-linux-x86_64.zip
     unzip protobuf.zip -d protobuf
     ./protobuf/bin/protoc object_detection/protos/*.proto --python_out=.
-    pip install .
+    python -m pip install .
     ```

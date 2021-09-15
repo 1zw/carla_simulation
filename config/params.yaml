@@ -24,3 +24,8 @@ lane_detection:
             lane_parameters:                  'lane/parameters'
             rgb_image:                        'carla/ego_vehicle/rgb_front/image'
             segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'
+object_detection:
+    ros__parameters:
+        topic:
+            rgb_image:                        'carla/ego_vehicle/rgb_front/image'
+            point_cloud:                      'points'
