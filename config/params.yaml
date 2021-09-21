@@ -3,7 +3,8 @@ lane_detection:
         display:                              false
         frame_id:
             lane_parameters:                  'laneParametersFrameId'
-        lane_color:                           [50,234,157]
+        color:
+            lane_marking:                           [157,234,50]
         m_per_pix:
             x:                                0.010278 # 3.7 meters / 360 pixels
             y:                                0.010417 # 5 meters / 480 pixels
@@ -26,6 +27,13 @@ lane_detection:
             segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'
 object_detection:
     ros__parameters:
+        color:
+            person:                           [220,20,60]
+            vehicle:                          [0,0,142]
+        min_contour_area:                     0 # TODO
+        qos_length:                           10
+        objects:                              ['person','vehicle']
         topic:
             rgb_image:                        'carla/ego_vehicle/rgb_front/image'
-            point_cloud:                      'points'
+            depth_image:                      'carla/ego_vehicle/depth_front/image'
+            segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'

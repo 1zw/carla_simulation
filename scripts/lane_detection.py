@@ -21,7 +21,7 @@ class LaneDetection(Node):
                                             ('topic.rgb_image',''),
                                             ('topic.segmentation',''),
                                             ('topic.lane_parameters', ''),
-                                            ('lane_color', [0,0,0]),
+                                            ('color.lane_marking', [0,0,0]),
                                             ('roi.x1_offset', 0),
                                             ('roi.x2_offset', 0),
                                             ('roi.y_offset', 0),
@@ -56,7 +56,7 @@ class LaneDetection(Node):
         self.lane_params_pub = self.create_publisher(LaneParameters,lane_params_topic,qos_profile)
 
     def nodeParams(self):
-        self.lane_color = np.array(self.get_parameter('lane_color').get_parameter_value().integer_array_value, dtype=np.uint8)
+        self.lane_marking_color = np.array(self.get_parameter('color.lane_marking').get_parameter_value().integer_array_value, dtype=np.uint8)
         self.do_once = True
         self.sliding_window = True
         self.nwindows = self.get_parameter('search_params.n_windows').get_parameter_value().integer_value
@@ -77,7 +77,7 @@ class LaneDetection(Node):
             self.height = seg_img.shape[0]
             self.width = seg_img.shape[1]
             self.roiParams()
-        binary = cv2.inRange(seg_img,self.lane_color,self.lane_color)
+        binary = cv2.inRange(seg_img,self.lane_marking_color,self.lane_marking_color)
         binary = binary // 255
         binary = cv2.warpPerspective(binary,self.tm,binary.shape[::-1],flags=cv2.INTER_LINEAR)
         self.findLanes(binary)
@@ -152,9 +152,9 @@ class LaneDetection(Node):
             self.right_fit = np.polyfit(righty, rightx, 2)
             # Calculate lane radius
             y_eval = self.height * self.ym_per_pix
-            self.lane_params_msg.left_radius = ((1 + (2 * self.left_fit[0] * y_eval + self.left_fit[1]) ** 2) ** 1.5) / np.abs(2 * self.left_fit[0])
-            self.lane_params_msg.right_radius = ((1 + (2 * self.right_fit[0] * y_eval + self.right_fit[1]) ** 2) ** 1.5) / np.abs(2 * self.right_fit[0])
-            self.lane_params_msg.centre_radius = (self.lane_params_msg.left_radius + self.lane_params_msg.right_radius) / 2
+            left_radius = ((1 + (2 * self.left_fit[0] * y_eval + self.left_fit[1]) ** 2) ** 1.5) / np.abs(2 * self.left_fit[0])
+            right_radius = ((1 + (2 * self.right_fit[0] * y_eval + self.right_fit[1]) ** 2) ** 1.5) / np.abs(2 * self.right_fit[0])
+            self.lane_params_msg.centre_radius = (left_radius + right_radius) / 2
             # Calculate centre offset
             bottom_left = self.left_fit[0] * (self.height ** 2) + self.left_fit[1] * self.height + self.left_fit[2]
             bottom_right = self.right_fit[0] * (self.height ** 2) + self.right_fit[1] * self.height + self.right_fit[2]
@@ -163,8 +163,7 @@ class LaneDetection(Node):
         else:
             self.sliding_window = True
             self.draw_area = False
-            self.lane_params_msg.left_radius = 0.0
-            self.lane_params_msg.right_radius = 0.0
+            self.lane_params_msg.centre_radius = 0.0
             self.lane_params_msg.centre_offset = 0.0
 
     def viewOutput(self,img):
