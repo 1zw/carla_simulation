@@ -4,7 +4,7 @@ lane_detection:
         frame_id:
             lane_parameters:                  'laneParametersFrameId'
         color:
-            lane_marking:                           [157,234,50]
+            lane_marking:                     [157,234,50]
         m_per_pix:
             x:                                0.010278 # 3.7 meters / 360 pixels
             y:                                0.010417 # 5 meters / 480 pixels
@@ -30,9 +30,9 @@ object_detection:
         color:
             person:                           [220,20,60]
             vehicle:                          [0,0,142]
-        min_contour_area:                     0 # TODO
+        display:                              false
         qos_length:                           10
-        objects:                              ['person','vehicle']
+        fov_per_pix:                          0.0032724923474893677 # (0.5 * pi) / 480
         topic:
             rgb_image:                        'carla/ego_vehicle/rgb_front/image'
             depth_image:                      'carla/ego_vehicle/depth_front/image'
