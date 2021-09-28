@@ -6,7 +6,7 @@ import numpy as np
 import cv2
 
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, QoSHistoryPolicy, QoSReliabilityPolicy
+from rclpy.qos import QoSProfile,QoSHistoryPolicy,QoSReliabilityPolicy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from carla_simulation.msg import LaneParameters
@@ -17,25 +17,25 @@ class LaneDetection(Node):
         super().__init__('lane_detection')
         # Declare ROS parameters
         self.declare_parameters(namespace='',
-                               	parameters=[('qos_length', 0),
+                               	parameters=[('qos_length',0),
                                             ('topic.rgb_image',''),
                                             ('topic.segmentation',''),
-                                            ('topic.lane_parameters', ''),
-                                            ('color.lane_marking', [0,0,0]),
-                                            ('roi.x1_offset', 0),
-                                            ('roi.x2_offset', 0),
-                                            ('roi.y_offset', 0),
-                                            ('roi.width1', 0),
-                                            ('roi.width2', 0),
-                                            ('roi.height', 0),
-                                            ('search_params.n_windows', 0),
-                                            ('search_params.margin', 0),
-                                            ('search_params.min_pixels', 0),
-                                            ('search_params.mean_limit', [0,0]),
-                                            ('m_per_pix.x', 0),
-                                            ('m_per_pix.y', 0),
-                                            ('frame_id.lane_parameters', ''),
-                                            ('display', False)])
+                                            ('topic.lane_parameters',''),
+                                            ('color.lane_marking',[]),
+                                            ('roi.x1_offset',0),
+                                            ('roi.x2_offset',0),
+                                            ('roi.y_offset',0),
+                                            ('roi.width1',0),
+                                            ('roi.width2',0),
+                                            ('roi.height',0),
+                                            ('search_params.n_windows',0),
+                                            ('search_params.margin',0),
+                                            ('search_params.min_pixels',0),
+                                            ('search_params.mean_limit',[]),
+                                            ('m_per_pix.x',0),
+                                            ('m_per_pix.y',0),
+                                            ('frame_id.lane_parameters',''),
+                                            ('display',False)])
         self.nodeParams()
         qos_length = self.get_parameter('qos_length').get_parameter_value().integer_value
         qos_profile = QoSProfile(depth=qos_length,
@@ -56,7 +56,7 @@ class LaneDetection(Node):
         self.lane_params_pub = self.create_publisher(LaneParameters,lane_params_topic,qos_profile)
 
     def nodeParams(self):
-        self.lane_marking_color = np.array(self.get_parameter('color.lane_marking').get_parameter_value().integer_array_value, dtype=np.uint8)
+        self.lane_marking_color = np.array(self.get_parameter('color.lane_marking').get_parameter_value().integer_array_value,dtype=np.uint8)
         self.do_once = True
         self.sliding_window = True
         self.nwindows = self.get_parameter('search_params.n_windows').get_parameter_value().integer_value
@@ -109,7 +109,7 @@ class LaneDetection(Node):
         nonzerox = np.array(nonzero[1])
         left_lane_inds = []
         right_lane_inds = []
-        histogram = np.sum(img[self.height // 2:,:], axis=0)
+        histogram = np.sum(img[self.height // 2:,:],axis=0)
         if self.mean_limit[0] < histogram.mean() < self.mean_limit[1]:
             if self.sliding_window: # Searching by sliding window
                 leftx_current = np.argmax(histogram[:self.width // 2])
@@ -148,8 +148,8 @@ class LaneDetection(Node):
         rightx = nonzerox[right_lane_inds]
         righty = nonzeroy[right_lane_inds]
         if len(leftx) > 0 and len(rightx) > 0:
-            self.left_fit = np.polyfit(lefty, leftx, 2)
-            self.right_fit = np.polyfit(righty, rightx, 2)
+            self.left_fit = np.polyfit(lefty,leftx,2)
+            self.right_fit = np.polyfit(righty,rightx,2)
             # Calculate lane radius
             y_eval = self.height * self.ym_per_pix
             left_radius = ((1 + (2 * self.left_fit[0] * y_eval + self.left_fit[1]) ** 2) ** 1.5) / np.abs(2 * self.left_fit[0])
@@ -173,7 +173,7 @@ class LaneDetection(Node):
             color_warp = np.zeros_like(img).astype(np.uint8)
             pts_left = np.array([np.transpose(np.vstack([left_fitx,self.ploty]))])
             pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx,self.ploty])))])
-            pts = np.hstack((pts_left, pts_right))
+            pts = np.hstack((pts_left,pts_right))
             cv2.fillPoly(color_warp,np.int32([pts]),(0,255,0))
             color_warp = cv2.warpPerspective(color_warp,self.tminv,(img.shape[1],img.shape[0]))
             img = cv2.addWeighted(img,1,color_warp,0.3,0)

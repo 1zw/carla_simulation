@@ -22,18 +22,23 @@ lane_detection:
             min_pixels:                       40
             n_windows:                        10
         topic:
-            lane_parameters:                  'lane/parameters'
+            lane_parameters:                  'carla_simulation/lane_parameters'
             rgb_image:                        'carla/ego_vehicle/rgb_front/image'
             segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'
 object_detection:
     ros__parameters:
-        color:
-            person:                           [220,20,60]
-            vehicle:                          [0,0,142]
         display:                              false
-        qos_length:                           10
         fov_per_pix:                          0.0032724923474893677 # (0.5 * pi) / 480
+        frame_id:
+            objects:                          'objectsFrameId'
+        obj_class:
+            name:                             ['person','vehicle']
+            color:
+                person:                       [220,20,60]
+                vehicle:                      [0,0,142]
+        qos_length:                           10
         topic:
-            rgb_image:                        'carla/ego_vehicle/rgb_front/image'
             depth_image:                      'carla/ego_vehicle/depth_front/image'
+            objects:                          'carla_simulation/objects'
+            rgb_image:                        'carla/ego_vehicle/rgb_front/image'
             segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'
