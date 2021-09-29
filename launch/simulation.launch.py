@@ -13,5 +13,11 @@ def generate_launch_description():
                      output = 'screen',
                      emulate_tty=True,
                      parameters = [config_path])
+    det_node =  Node(package = 'carla_simulation',
+                     executable = 'object_detection.py',
+                     output = 'screen',
+                     emulate_tty=True,
+                     parameters = [config_path])
     ld.add_action(lane_node)
+    ld.add_action(det_node)
     return ld
