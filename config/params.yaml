@@ -27,7 +27,7 @@ lane_detection:
             segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'
 object_detection:
     ros__parameters:
-        fov_per_pix:                          0.0032724923474893677 # (0.5 * pi) / 480
+        ## fov_per_pix:                          0.0032724923474893677 # (0.5 * pi) / 480
         frame_id:
             objects:                          'objectsFrameId'
         obj_class:
@@ -39,5 +39,4 @@ object_detection:
         topic:
             depth_image:                      'carla/ego_vehicle/depth_front/image'
             objects:                          'carla_simulation/objects'
-            rgb_image:                        'carla/ego_vehicle/rgb_front/image'
             segmentation:                     'carla/ego_vehicle/semantic_segmentation_front/image'

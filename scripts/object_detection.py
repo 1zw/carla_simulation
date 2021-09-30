@@ -24,9 +24,7 @@ class ObjectDetection(Node):
                                             ('obj_class.name',[]),
                                             ('obj_class.color.person',[]),
                                             ('obj_class.color.vehicle',[]),
-                                            ('frame_id.objects',''),
-                                            ('fov_per_pix',0),
-                                            ('display',False)])
+                                            ('frame_id.objects','')])
         self.nodeParams()
         qos_length = self.get_parameter('qos_length').get_parameter_value().integer_value
         qos_profile = QoSProfile(depth=qos_length,
@@ -51,7 +49,6 @@ class ObjectDetection(Node):
         self.class_color = {}
         for name in class_name:
             self.class_color[name] = np.array(self.get_parameter('obj_class.color.' + name).get_parameter_value().integer_array_value,dtype=np.uint8)
-        self.fov_per_pix = self.get_parameter('fov_per_pix').get_parameter_value().double_value
 
     def imgCallback(self,depth_msg,seg_msg):
         self.obj_msg = ObjectArray()
@@ -81,7 +78,7 @@ class ObjectDetection(Node):
                     temp_msg.classification = temp_obj.CLASSIFICATION_PERSON
                 elif name == 'vehicle':
                     temp_msg.classification = temp_obj.CLASSIFICATION_VEHICLE
-                temp_msg.detection_box = [x,y,w,h]
+                temp_msg.detection_box = [x,y,x + w,y + h]
                 temp_msg.depth = z_real
                 self.obj_msg.objects.append(temp_msg)          
 
