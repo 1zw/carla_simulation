@@ -18,6 +18,12 @@ def generate_launch_description():
                      output = 'screen',
                      emulate_tty=True,
                      parameters = [config_path])
+    track_node =  Node(package = 'carla_simulation',
+                       executable = 'object_tracking.py',
+                       output = 'screen',
+                       emulate_tty=True,
+                       parameters = [config_path])
     ld.add_action(lane_node)
     ld.add_action(det_node)
+    ld.add_action(track_node)
     return ld

@@ -52,14 +52,14 @@ class ObjectDetection(Node):
 
     def imgCallback(self,depth_msg,seg_msg):
         self.obj_msg = ObjectArray()
-        self.obj_msg.header.frame_id = self.get_parameter('frame_id.lane_parameters').get_parameter_value().string_value
+        self.obj_msg.header.frame_id = self.get_parameter('frame_id.objects').get_parameter_value().string_value
         depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
         seg_img = self.bridge.imgmsg_to_cv2(seg_msg)
         for name in self.class_color:
             binary = self.seg2Binary(seg_img,self.class_color[name])
             self.imgClassification(binary,depth_img,name)
         self.obj_msg.header.stamp = seg_msg.header.stamp
-        self.obj_pub.publish(self.lane_params_msg)
+        self.obj_pub.publish(self.obj_msg)
 
     def seg2Binary(self,img,color):
         img = cv2.inRange(img,color,color)

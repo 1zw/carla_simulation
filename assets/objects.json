@@ -2,26 +2,6 @@
     "objects": 
     [
         {
-            "type": "sensor.pseudo.traffic_lights",
-            "id": "traffic_lights"
-        },
-        {
-            "type": "sensor.pseudo.objects",
-            "id": "objects"
-        },
-        {
-            "type": "sensor.pseudo.actor_list",
-            "id": "actor_list"
-        },
-        {
-            "type": "sensor.pseudo.markers",
-            "id": "markers"
-        },
-        {
-            "type": "sensor.pseudo.opendrive_map",
-            "id": "map"
-        },
-        {
             "type": "vehicle.tesla.model3",
             "id": "ego_vehicle",
             "sensors": 
@@ -29,7 +9,7 @@
                 {
                     "type": "sensor.camera.rgb",
                     "id": "rgb_front",
-                    "spawn_point": {"x": 2.0, "y": 0.0, "z": 2.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
+                    "spawn_point": {"x": 1.4, "y": 0.0, "z": 1.7, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
                     "image_size_x": 720,
                     "image_size_y": 480,
                     "fov": 90.0
@@ -52,7 +32,7 @@
                 {
                     "type": "sensor.camera.semantic_segmentation",
                     "id": "semantic_segmentation_front",
-                    "spawn_point": {"x": 2.0, "y": 0.0, "z": 2.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
+                    "spawn_point": {"x": 1.4, "y": 0.0, "z": 1.7, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
                     "fov": 90.0,
                     "image_size_x": 720,
                     "image_size_y": 480
@@ -60,7 +40,7 @@
                 {
                     "type": "sensor.camera.depth",
                     "id": "depth_front",
-                    "spawn_point": {"x": 2.0, "y": 0.0, "z": 2.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
+                    "spawn_point": {"x": 1.4, "y": 0.0, "z": 1.7, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
                     "fov": 90.0,
                     "image_size_x": 720,
                     "image_size_y": 480
@@ -68,40 +48,10 @@
                 {
                     "type": "sensor.other.imu",
                     "id": "imu",
-                    "spawn_point": {"x": 2.0, "y": 0.0, "z": 2.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
+                    "spawn_point": {"x": 1.4, "y": 0.0, "z": 1.7, "roll": 0.0, "pitch": 0.0, "yaw": 0.0},
                     "noise_accel_stddev_x": 0.0, "noise_accel_stddev_y": 0.0, "noise_accel_stddev_z": 0.0,
                     "noise_gyro_stddev_x": 0.0, "noise_gyro_stddev_y": 0.0, "noise_gyro_stddev_z": 0.0,
                     "noise_gyro_bias_x": 0.0, "noise_gyro_bias_y": 0.0, "noise_gyro_bias_z": 0.0
-                },
-                {
-                    "type": "sensor.other.collision",
-                    "id": "collision",
-                    "spawn_point": {"x": 0.0, "y": 0.0, "z": 0.0}
-                },
-                {
-                    "type": "sensor.other.lane_invasion",
-                    "id": "lane_invasion",
-                    "spawn_point": {"x": 0.0, "y": 0.0, "z": 0.0}
-                },
-                {
-                    "type": "sensor.pseudo.tf",
-                    "id": "tf"
-                },
-                {
-                    "type": "sensor.pseudo.objects",
-                    "id": "objects"
-                },
-                {
-                    "type": "sensor.pseudo.odom",
-                    "id": "odometry"
-                },
-                {
-                    "type": "sensor.pseudo.speedometer",
-                    "id": "speedometer"
-                },
-                {
-                    "type": "actor.pseudo.control",
-                    "id": "control"
                 }
             ]
         }
